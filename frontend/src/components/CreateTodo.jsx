@@ -7,17 +7,17 @@ export function CreateTodo(){
 
    
    return <div>
-        <input type="text" placeholder="title" onChange={function(e){
+        <input style={{padding: "5px"}} type="text" placeholder="title" onChange={function(e){
             const value = e.target.value;
             setTitle(value);
         }}></input> <br /> <br />
 
-        <input type="text" placeholder="description" onChange={function(e){
+        <input style={{padding: "5px"}} type="text" placeholder="description" onChange={function(e){
             const value = e.target.value;
             setDescription(value);
         }}></input> <br /> <br />
 
-        <button onClick={() => {
+        <button style={{padding: "2px"}} onClick={() => {
             fetch("http://localhost:3000/todo",{
                 method: "POST",
                 body:JSON.stringify({

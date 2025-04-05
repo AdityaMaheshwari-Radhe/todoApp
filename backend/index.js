@@ -1,6 +1,6 @@
 const express = require('express');
 const { Schema, updateSchema } = require('./types');
-const { todo } = require('./db');
+const { Todo, CompletedTodo } = require('./db');
 const app = express();
 const cors = require('cors');
 
@@ -8,17 +8,18 @@ app.use(express.json());
 app.use(cors());
 
 app.get('/todo', async function(req,res){
-    const todos = await todo.find();
+    const todos = await Todo.find();
+    const doneTodos = await CompletedTodo.find();
     res.json({
-        todos
-    })
-    
+        todos,
+        doneTodos
+    })    
 })
 
 app.post("/todo", async function(req,res){
-    const todo = req.body;
+    const finalTodo = req.body;
     
-    const response = Schema.safeParse(todo);
+    const response = Schema.safeParse(finalTodo);
 
     if(!response.success){
         res.status(411).json({
@@ -27,11 +28,9 @@ app.post("/todo", async function(req,res){
         return;
     }
     
-    await todo.create({
-        title: todo.title,
-        description: todo.description,
-        completed: false
-    })
+    const todo = new Todo({title : finalTodo.title, description : finalTodo.description, completed : false})
+
+    await todo.save();
 
     res.json({
         msg : "todo created"
@@ -39,9 +38,9 @@ app.post("/todo", async function(req,res){
 })
 
 app.put('/completed', async function(req,res){
-    const id = req.body;
+    const { id } = req.body;
 
-    const response = updateSchema.safeParse(id);
+    const response = updateSchema.safeParse({id});
     
     if(!response.success){
         res.status(411).json({
@@ -50,11 +49,15 @@ app.put('/completed', async function(req,res){
         return;
     }
 
-    await todo.update({
-        _id: id[id]
-    },{
-        completed:true
-    })
+    await Todo.updateOne({ _id: id }, { completed: true });
+
+    const todo = await Todo.findOne({ _id : id })
+    if(todo){
+        const completed = new CompletedTodo(todo.toObject());
+        await completed.save();
+        await todo.deleteOne();
+    }
+
     
     res.json({
         msg : "todo is mark as done"
