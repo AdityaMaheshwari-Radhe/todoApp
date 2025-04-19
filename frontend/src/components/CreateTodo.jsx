@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export function CreateTodo(){
+export function CreateTodo({onTodoAdded}){
    
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
@@ -28,7 +28,8 @@ export function CreateTodo(){
                     "Content-type": "application/json"
                 }
             }).then(async function(res){
-                alert("todo added")
+                alert("todo added");
+                onTodoAdded();
             })
         }}>Add a todo</button>
     </div>

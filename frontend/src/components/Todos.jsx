@@ -1,4 +1,4 @@
-export function Todos({todos}) {
+export function Todos({todos, onMarkingCompleted}) {
     return <div>
         <h1>To-dos</h1>
         {todos.map(function(todo){
@@ -17,6 +17,7 @@ export function Todos({todos}) {
                         }
                     }).then(async function(res){
                         alert("todo completed");
+                        onMarkingCompleted();
                     })
                 }} >mark as completed</button>
             </div>
